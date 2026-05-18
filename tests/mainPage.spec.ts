@@ -1,17 +1,41 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
+const elements = [
+  {
+    locator: (page: Page) => page.getByRole('link', { name: 'Playwright logo Playwright' }),
+    name: 'Playwright logo link',
+  },
+  {
+    locator: (page: Page) => page.getByRole('link', { name: 'Docs' }),
+    name: 'Docs',
+  },
+  {
+    locator: (page: Page) => page.getByRole('link', { name: 'MCP', exact: true }),
+    name: 'MCP',
+  },
+  {
+    locator: (page: Page) => page.getByRole('button', { name: 'Node.js' }),
+    name: 'Node.js',
+  },
+  {
+    locator: (page: Page) => page.getByRole('link', { name: 'CLI', exact: true }),
+    name: 'CLI',
+  },
+  {
+    locator: (page: Page) => page.getByLabel('Switch between dark and light'),
+    name: 'light button',
+  },
+];
 test.describe('тесты главной страницы', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('https://playwright.dev/');
   });
   test('Проверка названия элементов отображения хэдера', async ({ page }) => {
-    await expect(page.getByRole('link', { name: 'Playwright logo Playwright' })).toContainText(
-      'Playwright',
-    );
-    await expect(page.getByRole('link', { name: 'Docs' })).toContainText('Docs');
-    await expect(page.getByRole('link', { name: 'MCP', exact: true })).toContainText('MCP');
-    await expect(page.getByRole('button', { name: 'Node.js' })).toContainText('Node.js');
-    await expect(page.getByRole('link', { name: 'CLI', exact: true })).toContainText('CLI');
+    elements.forEach(({ locator, name }) => {
+      test.step(`Проверка отображения элемента ${name}`, async () => {
+        await expect.soft(locator(page)).toBeVisible();
+      });
+    });
   });
   test('Проверка правильного значения аттрибутов href', async ({ page }) => {
     await expect(page.getByRole('link', { name: 'Playwright logo Playwright' })).toHaveAttribute(
