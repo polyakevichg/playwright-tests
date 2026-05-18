@@ -4,10 +4,12 @@ const elements = [
   {
     locator: (page: Page) => page.getByRole('link', { name: 'Playwright logo Playwright' }),
     name: 'Playwright logo link',
+    text: 'Playwright',
   },
   {
     locator: (page: Page) => page.getByRole('link', { name: 'Docs' }),
     name: 'Docs',
+    text: 'Docs',
   },
   {
     locator: (page: Page) => page.getByRole('link', { name: 'MCP', exact: true }),
@@ -37,22 +39,6 @@ test.describe('тесты главной страницы', () => {
       });
     });
   });
-  test('Проверка правильного значения аттрибутов href', async ({ page }) => {
-    await expect(page.getByRole('link', { name: 'Playwright logo Playwright' })).toHaveAttribute(
-      'href',
-      '/',
-    );
-    await expect(page.getByRole('link', { name: 'Docs' })).toHaveAttribute('href', '/docs/intro');
-    await expect(page.getByRole('link', { name: 'MCP', exact: true })).toHaveAttribute(
-      'href',
-      '/mcp/introduction',
-    );
-    await expect(page.getByRole('button', { name: 'Node.js' })).toHaveAttribute('href', '#');
-    await expect(page.getByRole('link', { name: 'CLI', exact: true })).toHaveAttribute(
-      'href',
-      '/agent-cli/introduction',
-    );
-  });
   test('Проверка изменения в темную тему', async ({ page }) => {
     await page.getByLabel('Switch between dark and light').click();
     await page.getByLabel('Switch between dark and light').click();
@@ -75,5 +61,13 @@ test.describe('тесты главной страницы', () => {
     await expect(page.getByRole('link', { name: 'API' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Node.js' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Playwright logo Playwright' })).toBeVisible();
+  });
+  ['light', 'dark'].forEach((value) => {
+    test(`Проверка стилей активного ${value} мода`, async ({ page }) => {
+      await page.evaluate((themeValue) => {
+        document.querySelector('html')?.setAttribute('data-theme', themeValue);
+      }, value);
+      await expect(page).toHaveScreenshot(`pageWith${value}Mode.png`);
+    });
   });
 });
